@@ -33,6 +33,7 @@ class CreditTerms(Base):
     
     # Relaciones
     customers = relationship("Customer", back_populates="credit_terms_ref")
+    credit_terms_discounts = relationship("CreditTermsDiscount", back_populates="credit_terms")
 
 class Customer(Base):
     """Modelo para clientes"""
@@ -138,6 +139,25 @@ class PaymentMethodDiscount(Base):
     
     __table_args__ = (
         CheckConstraint("discount_percent >= 0 AND discount_percent <= 100", name="check_discount_percent_range"),
+    )
+
+class CreditTermsDiscount(Base):
+    """Modelo para descuentos por términos de crédito"""
+    __tablename__ = "credit_terms_discount"
+    
+    discount_id = Column(Integer, primary_key=True, autoincrement=True)
+    credit_terms_id = Column(Integer, ForeignKey("credit_terms.credit_terms_id"), nullable=False)
+    discount_percent = Column(DECIMAL(5, 2), nullable=False)
+    created_at = Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    updated_at = Column(DateTime, onupdate=func.current_timestamp())
+    deleted_at = Column(DateTime)
+    
+    # Relaciones
+    credit_terms = relationship("CreditTerms", back_populates="credit_terms_discounts")
+    
+    __table_args__ = (
+        CheckConstraint("discount_percent >= 0 AND discount_percent <= 100", name="check_credit_terms_discount_percent_range"),
+        Index('idx_credit_terms_discount_terms', 'credit_terms_id'),
     )
 
 class Sale(Base):

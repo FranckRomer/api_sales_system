@@ -9,6 +9,7 @@ from app.repositories.customer_type_repository import CustomerTypeRepository
 from app.repositories.credit_terms_repository import CreditTermsRepository
 from app.repositories.product_type_repository import ProductTypeRepository
 from app.repositories.payment_method_repository import PaymentMethodRepository
+from app.repositories.credit_terms_discount_repository import CreditTermsDiscountRepository
 
 def init_database():
     """Inicializar la base de datos con datos básicos"""
@@ -41,8 +42,8 @@ def init_database():
         credit_terms_repo = CreditTermsRepository()
         credit_terms = [
             {"days": 30},
-            {"days": 60},
-            {"days": 90}
+            {"days": 90},
+            {"days": 120}
         ]
         
         for ct_data in credit_terms:
@@ -85,12 +86,41 @@ def init_database():
             else:
                 print(f"ℹ️  Método de pago ya existe: {pm_data['name']}")
         
+        # 5. Crear descuentos por términos de crédito (nuevo)
+        credit_terms_discount_repo = CreditTermsDiscountRepository()
+        
+        # Obtener los términos de crédito creados
+        credit_terms_30 = credit_terms_repo.get_by_days(db, 30)
+        credit_terms_90 = credit_terms_repo.get_by_days(db, 90)
+        credit_terms_120 = credit_terms_repo.get_by_days(db, 120)
+        
+        # Crear descuentos según las reglas de negocio: 30d=0%, 90d=2%, 120d=4%
+        credit_terms_discounts = [
+            {"credit_terms_id": credit_terms_30.credit_terms_id, "discount_percent": 0.0},
+            {"credit_terms_id": credit_terms_90.credit_terms_id, "discount_percent": 2.0},
+            {"credit_terms_id": credit_terms_120.credit_terms_id, "discount_percent": 4.0}
+        ]
+        
+        for ctd_data in credit_terms_discounts:
+            existing = credit_terms_discount_repo.get_by_credit_terms_id(db, ctd_data["credit_terms_id"])
+            if not existing:
+                credit_terms_discount_repo.create(db, ctd_data)
+                print(f"✅ Descuento por términos de crédito creado: {ctd_data['discount_percent']}%")
+            else:
+                print(f"ℹ️  Descuento por términos de crédito ya existe: {ctd_data['discount_percent']}%")
+        
         print("\n🎉 Base de datos inicializada correctamente!")
         print("\n📋 Datos creados:")
         print("   - Tipos de cliente: VIP, Regular")
-        print("   - Términos de crédito: 30, 60, 90 días")
+        print("   - Términos de crédito: 30, 90, 120 días")
         print("   - Tipos de producto: Electronics, Clothing, Books")
         print("   - Métodos de pago: Cash, Credit Card, Store Credit")
+        print("   - Descuentos por crédito: 30d=0%, 90d=2%, 120d=4%")
+        print("\n📊 Reglas de negocio implementadas:")
+        print("   - Descuentos secuenciales: Base → ProductType → PaymentMethod → CreditTerms")
+        print("   - Solo Store Credit aplica descuento por términos de crédito")
+        print("   - Redondeo a 2 decimales en cada línea")
+        print("   - Tax 16% sobre subtotal después de descuentos")
         
     except Exception as e:
         print(f"❌ Error al inicializar la base de datos: {e}")
