@@ -1,224 +1,237 @@
-# API Sales System
+# 🚀 API Sales System
 
-Sistema de API para gestión de ventas desarrollado con FastAPI.
+Sistema de API para gestión de ventas, clientes, productos y descuentos construido con FastAPI y SQLAlchemy ORM.
 
-## 🚀 Características
+## ✨ Características
 
-- API RESTful con FastAPI
-- Documentación automática con Swagger/OpenAPI
-- Tipado estático con Python
-- Gestión completa de clientes, productos, descuentos y ventas
-- Validación de datos con Pydantic
-- Base de datos en memoria para desarrollo
-- Tests automatizados con pytest
-- Cálculo automático de descuentos e impuestos
+- **FastAPI**: Framework web moderno y rápido
+- **SQLAlchemy ORM**: Mapeo objeto-relacional robusto
+- **MySQL**: Base de datos relacional
+- **Alembic**: Migraciones de base de datos
+- **Arquitectura modular**: Separación clara de responsabilidades
+- **Validación de datos**: Con Pydantic
+- **Documentación automática**: Swagger UI en `/docs`
 
-## 📋 Requisitos
+## 🏗️ Arquitectura
 
-- Python 3.8+
-- pip
+```
+app/
+├── config/           # Configuración de la aplicación
+├── database/         # Modelos y conexión a BD
+├── models/           # Modelos Pydantic para API
+├── repositories/     # Capa de acceso a datos
+├── routers/          # Endpoints de la API
+└── services/         # Lógica de negocio
+```
 
-## 🛠️ Instalación
+## 🚀 Instalación
 
-1. Clona el repositorio:
+### 1. Clonar el repositorio
 ```bash
-git clone https://github.com/tu-usuario/api_sales_system.git
+git clone <url-del-repositorio>
 cd api_sales_system
 ```
 
-2. Crea un entorno virtual:
+### 2. Crear entorno virtual
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # En Windows: venv\Scripts\activate
 ```
 
-3. Instala las dependencias:
+### 3. Instalar dependencias
 ```bash
 pip install -r requirements.txt
 ```
 
-## 🚀 Uso
-
-1. Activa el entorno virtual:
+### 4. Configurar variables de entorno
 ```bash
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+cp env.example .env
+# Editar .env con tus credenciales de MySQL
 ```
 
-2. Ejecuta la aplicación:
+### 5. Configurar base de datos MySQL
+Asegúrate de que MySQL esté corriendo en Docker:
 ```bash
-uvicorn main:app --reload
+# Verificar que MySQL esté corriendo
+docker ps | grep mysql
 ```
 
-3. Abre tu navegador y ve a:
-   - API: http://localhost:8000
-   - Documentación: http://localhost:8000/docs
-   - Documentación alternativa: http://localhost:8000/redoc
+### 6. Inicializar la base de datos
+```bash
+python init_db.py
+```
 
-## 📚 Endpoints Disponibles
+## 🗄️ Base de Datos
 
-### 👥 Clientes
-- `POST /customers` - Crear un nuevo cliente
-- `GET /customers` - Obtener todos los clientes
+### Estructura de Tablas
+- `customer_type`: Tipos de cliente (VIP, Regular)
+- `credit_terms`: Términos de crédito (30, 60, 90 días)
+- `customer`: Clientes del sistema
+- `product_type`: Tipos de producto
+- `product`: Productos disponibles
+- `payment_method`: Métodos de pago
+- `product_type_discount`: Descuentos por tipo de producto
+- `payment_method_discount`: Descuentos por método de pago
+- `sale`: Ventas realizadas
+- `sale_item`: Items de cada venta
 
-### 📦 Productos
-- `POST /products` - Crear un nuevo producto
-- `GET /products` - Obtener todos los productos
+### Inicialización
+El script `init_db.py` crea automáticamente:
+- Tipos de cliente: VIP, Regular
+- Términos de crédito: 30, 60, 90 días
+- Tipos de producto: Electronics, Clothing, Books
+- Métodos de pago: Cash, Credit Card, Store Credit
 
-### 🎯 Descuentos
+## 🚀 Ejecutar la API
+
+### Desarrollo
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Producción
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+## 📚 Endpoints de la API
+
+### Clientes
+- `POST /customers` - Crear cliente
+- `GET /customers` - Listar clientes
+
+### Productos
+- `POST /products` - Crear producto
+- `GET /products` - Listar productos
+
+### Descuentos
 - `POST /discounts/product` - Crear descuento por tipo de producto
 - `POST /discounts/payment` - Crear descuento por método de pago
 
-### 💰 Ventas
-- `POST /sales` - Crear una nueva venta (endpoint core)
-- `GET /sales` - Obtener todas las ventas
+### Ventas
+- `POST /sales` - Crear venta
+- `GET /sales` - Listar ventas
 
-### 🔍 Otros
-- `GET /` - Información de la API
-- `GET /health` - Estado de salud de la API
+## 🔧 Configuración
 
-## 🧪 Pruebas
+### Variables de Entorno (.env)
+```env
+# Configuración de la Aplicación
+APP_NAME=API Sales System
+APP_VERSION=1.0.0
+DEBUG=true
 
-Para ejecutar las pruebas:
+# Configuración de la Base de Datos
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_DATABASE=sales_system
+MYSQL_USER=tu_usuario
+MYSQL_PASSWORD=tu_password
+MYSQL_ROOT_PASSWORD=tu_root_password
+
+# Configuración de CORS
+CORS_ORIGINS=["*"]
+CORS_ALLOW_CREDENTIALS=true
+CORS_ALLOW_METHODS=["*"]
+CORS_ALLOW_HEADERS=["*"]
+```
+
+## 🧪 Testing
+
+### Ejecutar tests
 ```bash
 pytest
 ```
 
-Para ejecutar con más detalle:
+### Ejecutar tests con coverage
 ```bash
-pytest -v
+pytest --cov=app
 ```
 
-## 📝 Estructura del Proyecto
+## 📊 Migraciones con Alembic
 
-```
-api_sales_system/
-├── app/
-│   ├── __init__.py
-│   ├── models.py          # Modelos Pydantic
-│   ├── database.py        # Base de datos simulada
-│   └── routers/           # Endpoints organizados
-│       ├── __init__.py
-│       ├── customers.py   # Endpoints de clientes
-│       ├── products.py    # Endpoints de productos
-│       ├── discounts.py   # Endpoints de descuentos
-│       └── sales.py       # Endpoints de ventas
-├── tests/                 # Tests automatizados
-│   ├── __init__.py
-│   ├── test_customers.py
-│   ├── test_products.py
-│   ├── test_discounts.py
-│   └── test_sales.py
-├── main.py                # Aplicación principal
-├── requirements.txt       # Dependencias
-├── pytest.ini            # Configuración de pytest
-├── README.md             # Este archivo
-├── LICENSE               # Licencia MIT
-└── .gitignore            # Archivos a ignorar en Git
-```
-
-## 🔧 Desarrollo
-
-### Formateo de código
+### Inicializar Alembic
 ```bash
-black .
+alembic init alembic
 ```
 
-### Linting
+### Crear migración
 ```bash
-flake8 .
+alembic revision --autogenerate -m "Descripción del cambio"
 ```
 
-### Instalar dependencias de desarrollo
+### Aplicar migraciones
 ```bash
-pip install -r requirements.txt
+alembic upgrade head
 ```
 
-## 📊 Ejemplos de Uso
+### Revertir migración
+```bash
+alembic downgrade -1
+```
+
+## 🔍 Documentación de la API
+
+Una vez que la API esté corriendo, puedes acceder a:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+- **Health Check**: `http://localhost:8000/health`
+
+## 📝 Ejemplos de Uso
 
 ### Crear un Cliente
 ```bash
 curl -X POST "http://localhost:8000/customers/" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "name": "Ana",
-       "customer_type": "VIP",
-       "credit_terms_days": 90
-     }'
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Ana",
+    "customer_type": "VIP",
+    "credit_terms_days": 90
+  }'
 ```
 
 ### Crear un Producto
 ```bash
 curl -X POST "http://localhost:8000/products/" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "name": "Laptop",
-       "product_type": "Electronics",
-       "list_price": 15000.00
-     }'
-```
-
-### Crear Descuento por Tipo de Producto
-```bash
-curl -X POST "http://localhost:8000/discounts/product" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "product_type": "Electronics",
-       "discount_percent": 5.0
-     }'
-```
-
-### Crear Descuento por Método de Pago
-```bash
-curl -X POST "http://localhost:8000/discounts/payment" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "payment_method": "Cash",
-       "discount_percent": 5.0
-     }'
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Laptop",
+    "product_type": "Electronics",
+    "list_price": 15000.00
+  }'
 ```
 
 ### Crear una Venta
 ```bash
 curl -X POST "http://localhost:8000/sales/" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "customer_id": 1,
-       "payment_method": "Store Credit",
-       "items": [
-         {
-           "product_id": 1,
-           "quantity": 1
-         }
-       ]
-     }'
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": 1,
+    "payment_method": "Store Credit",
+    "items": [
+      {"product_id": 1, "quantity": 1}
+    ]
+  }'
 ```
 
-## 💡 Lógica de Negocio
+## 🐛 Troubleshooting
 
-### Tipos de Cliente
-- **VIP**: Términos de crédito extendidos (hasta 365 días)
-- **Regular**: Términos de crédito estándar (hasta 365 días)
+### Error de conexión a MySQL
+- Verifica que MySQL esté corriendo en Docker
+- Confirma las credenciales en `.env`
+- Asegúrate de que el puerto 3306 esté accesible
 
-### Descuentos Aplicados
-1. **Por tipo de producto**: Descuento específico por categoría
-2. **Por método de pago**: Descuento según forma de pago
-3. **Por términos de crédito**: 1.9% adicional para "Store Credit"
+### Error de importación
+- Verifica que el entorno virtual esté activado
+- Ejecuta `pip install -r requirements.txt` nuevamente
 
-### Cálculo de Impuestos
-- Tasa de impuesto: 16% por defecto
-- Se aplica sobre el subtotal después de descuentos
-
-### Estructura de Respuesta de Venta
-La respuesta incluye un breakdown detallado con:
-- Líneas de productos con descuentos individuales
-- Subtotal después de descuentos
-- Impuestos calculados
-- Total final
-- Monto total de descuentos aplicados
+### Error de tablas
+- Ejecuta `python init_db.py` para crear las tablas
+- Verifica que MySQL esté funcionando correctamente
 
 ## 🤝 Contribuir
 
-1. Haz un Fork del proyecto
+1. Fork el proyecto
 2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
 3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
 4. Push a la rama (`git push origin feature/AmazingFeature`)
@@ -228,12 +241,13 @@ La respuesta incluye un breakdown detallado con:
 
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para más detalles.
 
-## 👨‍💻 Autor
+## 🆘 Soporte
 
-Tu Nombre - [tu-email@ejemplo.com](mailto:tu-email@ejemplo.com)
+Si tienes problemas o preguntas:
+1. Revisa la documentación de la API en `/docs`
+2. Verifica los logs de la aplicación
+3. Abre un issue en el repositorio
 
-## 🙏 Agradecimientos
+---
 
-- FastAPI por el excelente framework
-- Pydantic por la validación de datos
-- La comunidad de Python por el soporte continuo
+**¡Disfruta usando la API Sales System! 🎉**

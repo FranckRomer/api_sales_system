@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import customers, products, discounts, sales
+from app.config.settings import settings
 
 app = FastAPI(
-    title="API Sales System",
+    title=settings.APP_NAME,
     description="Sistema de API para gestión de ventas, clientes, productos y descuentos",
-    version="1.0.0",
+    version=settings.APP_VERSION,
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -13,10 +14,10 @@ app = FastAPI(
 # Configurar CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=settings.CORS_ALLOW_CREDENTIALS,
+    allow_methods=settings.CORS_ALLOW_METHODS,
+    allow_headers=settings.CORS_ALLOW_HEADERS,
 )
 
 # Incluir routers
@@ -31,8 +32,8 @@ def read_root():
     Endpoint raíz de la API
     """
     return {
-        "message": "Bienvenido a API Sales System",
-        "version": "1.0.0",
+        "message": f"Bienvenido a {settings.APP_NAME}",
+        "version": settings.APP_VERSION,
         "docs": "/docs",
         "endpoints": {
             "customers": "/customers",
@@ -47,4 +48,4 @@ def health_check():
     """
     Endpoint de verificación de salud de la API
     """
-    return {"status": "healthy", "service": "API Sales System"}
+    return {"status": "healthy", "service": settings.APP_NAME}
